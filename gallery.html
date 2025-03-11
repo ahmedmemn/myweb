@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wild Bloom | Gallery</title>
+
+  <!-- External Resources -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  
+  <style>
+    /* Global Resets & Theme Variables */
+    :root {
+      --primary: #ff4d4d;
+      --accent: #ffd93d;
+      --dark: #0a0a0a;
+      --light: #ffffff;
+      --gradient: linear-gradient(45deg, var(--primary), var(--accent));
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--dark);
+      color: var(--light);
+      overflow-x: hidden;
+    }
+    
+    /* Welcome Overlay & Animations */
+    .welcome-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: overlayFadeOut 1.5s ease-in-out forwards;
+      animation-delay: 4s;
+    }
+    .welcome-text {
+      font-family: 'Arial', sans-serif;
+      font-size: 3rem;
+      color: var(--dark);
+      background: radial-gradient(circle, rgba(255,77,77,1) 21%, rgba(255,217,61,1) 100%);
+      text-align: center;
+      padding: 1.5rem 2rem;
+      border-radius: 10px;
+      opacity: 0;
+      transform: scale(0.9);
+      animation: textBounce 2s ease-in-out forwards;
+    }
+    @keyframes textBounce {
+      0% { opacity: 0; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); }
+      100% { opacity: 0; transform: scale(1); }
+    }
+    @keyframes overlayFadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+    
+    /* Navigation */
+    .glass-nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 1.5rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(15px);
+      z-index: 1000;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--light);
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    
+    /* Gallery Hero Section */
+    .gallery-hero {
+      height: 70vh;
+      background: linear-gradient(rgba(10,10,10,0.7), rgba(10,10,10,0.7)),
+                  url('https://images.unsplash.com/photo-1527525443983-6e60c75fff46');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 10%;
+      position: relative;
+      overflow: hidden;
+    }
+    .gallery-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    .hero-title {
+      font-size: clamp(2.5rem, 8vw, 6rem);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .hero-subtitle {
+      font-size: 1.5rem;
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Gallery Filter */
+    .gallery-filter {
+      padding: 3rem 10%;
+      text-align: center;
+      background: #111;
+    }
+    .filter-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: transparent;
+      color: var(--light);
+      border: 2px solid var(--primary);
+      padding: 0.75rem 2rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .filter-btn:hover {
+      transform: scale(1.05);
+      background: var(--gradient);
+      border-color: transparent;
+    }
+    .filter-btn.active {
+      background: var(--gradient);
+      border-color: transparent;
+    }
+    
+    /* Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      padding: 4rem 10%;
+    }
+    .gallery-item {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.3s;
+    }
+    .gallery-item:hover {
+      transform: translateY(-5px);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+    .item-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .gallery-item:hover .item-overlay {
+      opacity: 1;
+    }
+    .item-caption {
+      color: var(--light);
+      transform: translateY(20px);
+      transition: transform 0.3s;
+    }
+    .gallery-item:hover .item-caption {
+      transform: translateY(0);
+    }
+    
+    /* Lightbox Styles */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 10, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      opacity: 0;
+    }
+    .lightbox.active {
+      display: flex;
+    }
+    .lightbox-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+    }
+    .lightbox-img {
+      max-height: 80vh;
+      border-radius: 10px;
+    }
+    .close-btn {
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      color: var(--light);
+      font-size: 2rem;
+      cursor: pointer;
+      transition: color 0.3s, transform 0.3s;
+    }
+    .close-btn:hover {
+      color: var(--primary);
+      transform: scale(1.1);
+    }
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--light);
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 1rem;
+      transition: color 0.3s, transform 0.3s;
+    }
+    .nav-btn:hover {
+      color: var(--primary);
+      transform: scale(1.1);
+    }
+    .prev-btn {
+      left: 2rem;
+    }
+    .next-btn {
+      right: 2rem;
+    }
+    
+    /* Footer */
+    .main-footer {
+      background: #1a1a1a;
+      padding: 4rem 10%;
+      margin-top: 6rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+    }
+    .footer-contact h3,
+    .footer-social h3 {
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    .footer-contact p {
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+    .social-links {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .social-links a {
+      color: var(--light);
+      font-size: 1.8rem;
+      transition: color 0.3s;
+    }
+    .social-links a:hover {
+      color: var(--primary);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .glass-nav {
+        padding: 1rem 5%;
+      }
+      .nav-logo {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Welcome Overlay -->
+  <div class="welcome-overlay">
+    <div class="welcome-text">
+      Our Gallery
+    </div>
+  </div>
+  
+  <!-- Navigation -->
+  <nav class="glass-nav">
+    <div class="nav-logo">WILD BLOOM</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="about.html">About</a></li>
+
+    </ul>
+  </nav>
+  
+  <!-- Gallery Hero Section -->
+  <section class="gallery-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Our Gallery</h1>
+      <p class="hero-subtitle">Discover the beauty of our events captured in stunning imagery.</p>
+    </div>
+  </section>
+  
+  <!-- Gallery Filter -->
+  <section class="gallery-filter">
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="wedding">Weddings</button>
+      <button class="filter-btn" data-filter="corporate">Corporate</button>
+      <button class="filter-btn" data-filter="social">Social</button>
+      <button class="filter-btn" data-filter="decor">Decor</button>
+    </div>
+  </section>
+  
+  <!-- Gallery Grid -->
+  <section class="gallery-grid">
+    <!-- Weddings (3 items) -->
+    <div class="gallery-item" data-category="wedding">
+      <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04" alt="Wedding Event">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Luxury Wedding</h3>
+          <p>Grand ballroom celebration</p>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" data-category="wedding">
+      <img src="https://images.unsplash.com/photo-1511988617509-a57c8a288659" alt="Elegant Wedding">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Elegant Ceremony</h3>
+          <p>Timeless romance</p>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" data-category="wedding">
+      <img src="https://images.unsplash.com/photo-1557800636-894a64c1696f" alt="Outdoor Wedding">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Outdoor Wedding</h3>
+          <p>Scenic garden affair</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Corporate (3 items) -->
+    <div class="gallery-item" data-category="corporate">
+      <img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce" alt="Corporate Event">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Product Launch</h3>
+          <p>Innovative reveal</p>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" data-category="corporate">
+      <img src="https://images.unsplash.com/photo-1565372910779-5d8eaf157d1f" alt="Corporate Meeting">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Business Summit</h3>
+          <p>Professional gathering</p>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" data-category="corporate">
+      <img src="https://images.unsplash.com/photo-1581091012184-7b8b1214ce9e" alt="Networking Event">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Networking Event</h3>
+          <p>Corporate connect</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Social (3 items) -->
+    <div class="gallery-item" data-category="social">
+      <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6" alt="Social Celebration">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Milestone Birthday</h3>
+          <p>Golden celebration</p>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" data-category="social">
+      <img src="https://images.unsplash.com/photo-1508609349937-5ec4ae374eb8" alt="Party Vibes">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Party Night</h3>
+          <p>Vibrant social event</p>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" data-category="social">
+      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d" alt="Casual Social">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Casual Gathering</h3>
+          <p>Fun with friends</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Decor (3 items) -->
+    <div class="gallery-item" data-category="decor">
+      <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622" alt="Event Decor">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Floral Installation</h3>
+          <p>Custom ceremony backdrop</p>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" data-category="decor">
+      <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c" alt="Elegant Decor">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Elegant Decor</h3>
+          <p>Artistic design</p>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" data-category="decor">
+      <img src="https://images.unsplash.com/photo-1606323366203-0a52cc645b5b" alt="Modern Decor">
+      <div class="item-overlay">
+        <div class="item-caption">
+          <h3>Modern Decor</h3>
+          <p>Sleek & stylish</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Lightbox -->
+  <div class="lightbox">
+    <span class="close-btn">&times;</span>
+    <div class="lightbox-content">
+      <img class="lightbox-img" src="" alt="Enlarged View">
+    </div>
+    <button class="nav-btn prev-btn"><</button>
+    <button class="nav-btn next-btn">></button>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h2>Wild Bloom</h2>
+        <p>Creating magic since 2010</p>
+      </div>
+      <div class="footer-contact">
+        <h3>Contact</h3>
+        <p>📞 +1 (555) 123-4567</p>
+        <p>📧 events@wildbloom.com</p>
+        <p>📍 123 Luxury Avenue, NYC</p>
+      </div>
+      <div class="footer-social">
+        <h3>Follow Us</h3>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-pinterest"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      /* Welcome Overlay Removal */
+      const overlay = document.querySelector('.welcome-overlay');
+      overlay.addEventListener('animationend', () => {
+        overlay.style.display = 'none';
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          overlay.style.display = 'none';
+          lightbox.classList.remove('active');
+        }
+      });
+      
+      /* Navigation Animations */
+      gsap.from('.nav-logo', { duration: 1, y: -30, opacity: 0, ease: "power2.out" });
+      gsap.from('.nav-links li', { duration: 1, y: -30, opacity: 0, ease: "power2.out", stagger: 0.2, delay: 0.3 });
+      
+      /* Hero Text Animation */
+      gsap.from('.hero-title', { duration: 1.5, y: -50, opacity: 0, ease: "power4.out" });
+      gsap.from('.hero-subtitle', { duration: 1.5, y: 50, opacity: 0, ease: "power4.out", delay: 0.5 });
+      
+      /* Filter Button & Gallery Animation */
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const galleryItems = document.querySelectorAll('.gallery-item');
+      
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          
+          // Animate items that match the filter
+          const visibleItems = Array.from(galleryItems).filter(item => filter === 'all' || item.dataset.category === filter);
+          const hiddenItems = Array.from(galleryItems).filter(item => filter !== 'all' && item.dataset.category !== filter);
+          
+          // Hide unmatched items
+          hiddenItems.forEach(item => {
+            gsap.to(item, { 
+              duration: 0.5,
+              opacity: 0,
+              scale: 0.8,
+              display: 'none',
+              ease: "power2.out"
+            });
+          });
+          // Show matched items with a stagger
+          gsap.to(visibleItems, { 
+            duration: 0.5,
+            opacity: 1,
+            scale: 1,
+            display: 'block',
+            ease: "power2.out",
+            stagger: 0.1
+          });
+        });
+      });
+      
+      /* Lightbox Functionality */
+      const lightbox = document.querySelector('.lightbox');
+      const lightboxImg = document.querySelector('.lightbox-img');
+      const galleryImages = document.querySelectorAll('.gallery-item img');
+      let currentIndex = 0;
+      
+      galleryImages.forEach((img, index) => {
+        img.addEventListener('click', () => {
+          currentIndex = index;
+          lightboxImg.src = img.src;
+          gsap.fromTo(lightbox, {opacity: 0}, {opacity: 1, duration: 0.5, onStart: () => lightbox.classList.add('active')});
+        });
+      });
+      
+      document.querySelector('.close-btn').addEventListener('click', () => {
+        gsap.to(lightbox, {opacity: 0, duration: 0.5, onComplete: () => lightbox.classList.remove('active')});
+      });
+      
+      document.querySelector('.prev-btn').addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+        lightboxImg.src = galleryImages[currentIndex].src;
+      });
+      
+      document.querySelector('.next-btn').addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % galleryImages.length;
+        lightboxImg.src = galleryImages[currentIndex].src;
+      });
+      
+      /* Scroll-triggered Animations for Gallery Items */
+      gsap.utils.toArray('.gallery-item').forEach((item, index) => {
+        gsap.from(item, {
+          scrollTrigger: {
+            trigger: item,
+            start: "top 80%"
+          },
+          opacity: 0,
+          y: 50,
+          duration: 0.8,
+          delay: index * 0.1
+        });
+      });
+    });
+  </script>
+</body>
+</html>
